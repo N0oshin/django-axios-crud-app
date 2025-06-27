@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Item Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <h1>Item List</h1>
+    <ul id="item-list"></ul>
+
+    <h2>Add Item</h2>
+    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="description" placeholder="Description">
+    <button onclick="addItem()">Add</button>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api/items/';
+
+        function fetchItems() {
+            axios.get(API_URL)
+                .then(response => {
+                    const list = document.getElementById('item-list');
+                    list.innerHTML = '';
+                    response.data.forEach(item => {
+                        list.innerHTML += `<li>${item.name} - ${item.description} 
+              <button onclick="deleteItem(${item.id})">Delete</button></li>`;
+                    });
+                })
+                .catch(error => console.error(error));
+        }
+
+        function addItem() {
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            axios.post(API_URL, { name, description })
+                .then(() => fetchItems())
+                .catch(error => console.error(error));
+        }
+
+        function deleteItem(id) {
+            axios.delete(`${API_URL}${id}/`)
+                .then(() => fetchItems())
+                .catch(error => console.error(error));
+        }
+
+        // Load items when page loads
+        fetchItems();
+    </script>
+</body>
+
+</html>
